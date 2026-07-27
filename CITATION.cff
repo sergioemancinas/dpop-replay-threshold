@@ -4,6 +4,6 @@ title: "Operational Realities of Sender-Constrained OAuth: Replay-State Scaling 
 type: software
 authors:
   - alias: sergioemancinas
-repository-code: "https://github.com/sergioemancinas/oauth-dpop-replay-threshold"
+repository-code: "https://github.com/sergioemancinas/dpop-replay-threshold"
 license: Apache-2.0
 # doi: 10.5281/zenodo.XXXXXXX   # add the Zenodo archive DOI once minted
