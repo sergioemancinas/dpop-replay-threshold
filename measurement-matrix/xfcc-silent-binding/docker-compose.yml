@@ -1,0 +1,91 @@
+name: oauth-xfcc-silent-binding
+
+# Host ports are 18080 and 18443/18444. 8080, 8081 and 9000 belong to
+# ../../single-host-validation/ and are not touched here.
+#
+# pki/generate_pki.py generates the PKI this stack bind-mounts. Envoy and the issuer both bind-mount
+# pki/out/ and will fail to start without it.
+
+x-resource-server: &resource-server
+  build: ./resource-server
+  environment: &resource-server-env
+    SERVER_PORT: "8082"
+    # Same variable names as ../../single-host-validation/docker-compose.yml, which is
+    # the only evidence in this repository that these bind correctly. Anything without
+    # that precedent is set in application.yml instead, notably jws-algorithms (a list,
+    # awkward to express in the environment) and max-http-request-header-size.
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://xfcc-demo.invalid/issuer
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://issuer:80/jwks.json
+  depends_on:
+    - issuer
+  restart: on-failure
+
+services:
+
+  # Static JWKS for the access tokens the test harness mints. There is no authorization
+  # server in this stack; see README, "Why there is no Keycloak in this stack".
+  issuer:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./pki/out/jwks.json:/usr/share/nginx/html/jwks.json:ro
+    ports:
+      - "127.0.0.1:18080:80"
+
+  envoy:
+    image: envoyproxy/envoy:v1.35.13
+    command:
+      - --config-path
+      - /etc/envoy/envoy.yaml
+      - --log-level
+      - info
+    volumes:
+      - ./envoy/envoy.yaml:/etc/envoy/envoy.yaml:ro
+      - ./pki/out/ca.crt:/etc/envoy/pki/ca.crt:ro
+      - ./pki/out/server.crt:/etc/envoy/pki/server.crt:ro
+      - ./pki/out/server.key:/etc/envoy/pki/server.key:ro
+    ports:
+      # Listener A, complete propagation: Cert and Chain present.
+      - "127.0.0.1:18443:10443"
+      # Listener B, lossy propagation: Subject, URI, DNS only.
+      - "127.0.0.1:18444:10444"
+    depends_on:
+      - rs-x1-strict
+      - rs-x1-lenient
+      - rs-x2-strict
+      - rs-x2-lenient
+
+  # ---- X1: the shim percent-decodes Envoy's Cert field, as the encoding requires ----
+
+  # Correct end to end. Spring Security's own fail-closed thumbprint validator.
+  rs-x1-strict:
+    <<: *resource-server
+    environment:
+      <<: *resource-server-env
+      XFCC_URL_DECODE: "true"
+      XFCC_BINDING_POLICY: strict
+
+  # Control for X2-lenient: the lenient policy still rejects the wrong certificate when
+  # propagation works, so any acceptance in X2-lenient is attributable to propagation.
+  rs-x1-lenient:
+    <<: *resource-server
+    environment:
+      <<: *resource-server-env
+      XFCC_URL_DECODE: "true"
+      XFCC_BINDING_POLICY: lenient
+
+  # ---- X2: the shim parses the Cert field without percent-decoding it ----
+
+  rs-x2-strict:
+    <<: *resource-server
+    environment:
+      <<: *resource-server-env
+      XFCC_URL_DECODE: "false"
+      XFCC_BINDING_POLICY: strict
+
+  # The silent cell.
+  rs-x2-lenient:
+    <<: *resource-server
+    environment:
+      <<: *resource-server-env
+      XFCC_URL_DECODE: "false"
+      XFCC_BINDING_POLICY: lenient

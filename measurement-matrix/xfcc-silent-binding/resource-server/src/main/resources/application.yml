@@ -1,0 +1,46 @@
+# Defaults. Every value here is overridden per container in ../../docker-compose.yml,
+# so the four cells differ only in environment.
+server:
+  port: 8082
+  # A percent-encoded PEM Cert plus Chain is bulky. Tomcat's 8 KB default is comfortable
+  # for the P-256 certificates pki/generate_pki.py produces and is not for RSA-4096.
+  # Raised defensively; this is a real operational hazard of XFCC, not something that
+  # was observed to be needed here.
+  max-http-request-header-size: 32KB
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # The stub issuer serves a static JWKS. See ../../README.md, "Why there is no
+          # Keycloak in this stack".
+          issuer-uri: https://xfcc-demo.invalid/issuer
+          jwk-set-uri: http://issuer:80/jwks.json
+          # Spring Boot's default is RS256 only. The demonstration signs with ES256 to
+          # match the DPoP material in ../../../single-host-validation/.
+          jws-algorithms: ES256
+
+xfcc:
+  # X1 when true, X2 when false.
+  url-decode: true
+  # strict: Spring Boot's autoconfigured chain, including Spring Security's own
+  #         fail-closed X509CertificateThumbprintValidator.
+  # lenient: a hand-built chain whose confirmation check skips when no certificate
+  #          is available.
+  binding-policy: strict
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+logging:
+  level:
+    io.github.sergioemancinas.xfcc: DEBUG
+    org.springframework.security.oauth2.jwt: DEBUG

@@ -1,0 +1,18 @@
+target/
+build/
+*.class
+*.jar
+!gradle/wrapper/gradle-wrapper.jar
+# results are committed as evidence
+
+single-host-validation/load/proofs/
+.DS_Store
+*.log
+
+__pycache__/
+*.pyc
+
+# Results are committed as evidence. Track them explicitly so a reproducing
+# third party's outputs are not silently hidden by a broad rule.
+!**/results/
+!**/results/*

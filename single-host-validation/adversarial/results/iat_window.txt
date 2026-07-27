@@ -1,0 +1,24 @@
+Part 1: acceptance as a function of iat offset from now
+  iat = now  -130 s  ->  401  reject
+  iat = now  -120 s  ->  401  reject
+  iat = now   -90 s  ->  401  reject
+  iat = now   -61 s  ->  401  reject
+  iat = now   -59 s  ->  200  accept
+  iat = now   -30 s  ->  200  accept
+  iat = now    +0 s  ->  200  accept
+  iat = now   +30 s  ->  200  accept
+  iat = now   +59 s  ->  200  accept
+  iat = now   +61 s  ->  401  reject
+  iat = now   +90 s  ->  401  reject
+  iat = now  +120 s  ->  401  reject
+  iat = now  +130 s  ->  401  reject
+
+  accepted offsets span -59 to +59 = 118 s
+
+Part 2: how long one future-dated proof stays usable
+  t=0 s   first use            -> 200
+  t=60 s  fresh jti, same iat  -> 200 (iat is now +5 s old)
+  t=100 s  fresh jti, same iat  -> 200 (iat is now +45 s old)
+
+Observed window is two-sided and ~120 s wide, as the validator source implies.
+A cache must therefore retain a jti for 2*clockSkew, not clockSkew.

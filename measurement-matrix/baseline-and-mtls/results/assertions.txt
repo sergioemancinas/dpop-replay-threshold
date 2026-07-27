@@ -1,0 +1,50 @@
+
+PKI under test
+  INFO  client-a x5t#S256 (expected binding)                       AYDEQy5Ssh8mUJSDDc_VOG9wY6GkLHA3oyI16npptdY
+  INFO  client-b x5t#S256 (unbound peer)                           YFtEJVb1Ys4nVCjYSclEGMG5egvnpTl4if63TQ44Fic
+  PASS  the two client certificates are distinct                   expected True, got True
+
+Authorization server metadata
+  INFO  tls_client_certificate_bound_access_tokens (advertised)    True
+  INFO  tls_client_auth in token_endpoint_auth_methods_supported   True
+
+C0  bearer baseline: token acquisition
+  PASS  bearer-client token request succeeds                       expected 200, got 200  ({"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOSExyV1B6c3RFYnRCN1BXY013S3JWUFVhemJmNEtaTEdJc1M4aEc)
+  PASS  token_type is Bearer                                       expected 'Bearer', got 'Bearer'
+  PASS  C0 token carries no cnf claim                              expected None, got None
+
+C0  the token is a pure bearer instrument
+  PASS  accepted over client certificate A                         expected 200, got 200
+  PASS  replayed over a different certificate B                    expected 200, got 200  (no possession check)
+  PASS  replayed with no client certificate at all                 expected 200, got 200  (no possession check)
+
+C0  the resource server does validate something
+  PASS  garbage token rejected                                     expected 401, got 401
+  PASS  token with a tampered signature rejected                   expected 401, got 401
+
+C0  unbound token at the binding-required endpoint
+  PASS  bearer token admitted by the default endpoint              expected 200, got 200  (Spring default fails open on absent cnf)
+  PASS  bearer token rejected by /api/bound                        expected 403, got 403
+
+M1  tls_client_auth at the token endpoint (RFC 8705 section 2.1)
+  PASS  mtls-client authenticates with certificate A               expected 200, got 200  ({"access_token":"eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJOSExyV1B6c3RFYnRCN1BXY013S3JWUFVhemJmNEtaTEdJc1M4aEc2RlU4In0.eyJleHAiOjE3ODUxNzEwMjMsImlhdCI)
+  PASS  mtls-client rejected with certificate B                    expected 401, got 401  (subject DN mismatch)
+  PASS  mtls-client rejected with no certificate                   expected 401, got 401
+
+M1  the token is certificate bound (RFC 8705 section 3.1)
+  PASS  access token carries a cnf claim                           expected True, got True
+  PASS  cnf contains x5t#S256                                      expected True, got True
+  PASS  x5t#S256 equals base64url(SHA-256(DER(client-a)))          expected 'AYDEQy5Ssh8mUJSDDc_VOG9wY6GkLHA3oyI16npptdY', got 'AYDEQy5Ssh8mUJSDDc_VOG9wY6GkLHA3oyI16npptdY'
+  PASS  x5t#S256 is not the other certificate's thumbprint         expected False, got False
+
+M1  presentation to the resource server
+  PASS  accepted over the bound certificate A                      expected 200, got 200
+  PASS  rejected over a different certificate B                    expected 401, got 401  (thumbprint mismatch)
+  PASS  rejected with no client certificate                        expected 401, got 401  (no certificate to compare)
+
+M1  binding-required endpoint
+  PASS  accepted at /api/bound over certificate A                  expected 200, got 200
+  PASS  rejected at /api/bound over certificate B                  expected 401, got 401
+  PASS  /api/bound echoes the bound thumbprint                     expected 'AYDEQy5Ssh8mUJSDDc_VOG9wY6GkLHA3oyI16npptdY', got 'AYDEQy5Ssh8mUJSDDc_VOG9wY6GkLHA3oyI16npptdY'
+
+24 passed, 0 failed

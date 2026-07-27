@@ -1,0 +1,62 @@
+name: oauth-replay-baseline-mtls
+
+# Host ports 9443 and 9444. 8080, 8081 and 9000 belong to other conditions in this
+# repository and are deliberately avoided.
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.1
+    command:
+      - start-dev
+      - --import-realm
+      # start-dev force-enables plain HTTP; it does not disable the HTTPS listener.
+      # The HTTPS listener comes up because certificate material is configured below.
+      # https://www.keycloak.org/server/enabletls
+      - --https-certificate-file=/certs/keycloak/kc.crt
+      - --https-certificate-key-file=/certs/keycloak/kc.key
+      # request, not required: bearer-client (condition C0) must be able to reach the
+      # token endpoint with no client certificate at all. required would refuse that
+      # connection during the handshake and C0 could not be run against the same
+      # listener. https://www.keycloak.org/server/mutual-tls
+      - --https-client-auth=request
+      # Narrow the accepted client-certificate issuers to our lab CA. Left unset,
+      # Keycloak falls back to the system truststore for mTLS client validation,
+      # which trusts every CA in the JRE bundle.
+      # https://www.keycloak.org/server/keycloak-truststore
+      #
+      # PEM is inferred from the .pem extension and takes no password. See README.
+      - --https-trust-store-file=/certs/ca/ca.pem
+      # Pin the issuer so the iss claim is identical whether the caller reaches
+      # Keycloak from the host or from inside the compose network.
+      - --hostname=https://localhost:9443
+      - --hostname-backchannel-dynamic=false
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+      - ./certs/generated/ca:/certs/ca:ro
+      - ./certs/generated/keycloak:/certs/keycloak:ro
+    ports:
+      # Only the HTTPS listener is published. Container port 8080 stays on the
+      # compose network, where the resource server fetches the JWK set.
+      - "127.0.0.1:9443:8443"
+
+  resource-server:
+    build: ./resource-server
+    environment:
+      # Issuer is validated as the https://localhost:9443 form that Keycloak mints.
+      # Keys are fetched over the compose network on plain HTTP, where that host name
+      # does not resolve and where no TLS trust anchor has to be injected into the JVM.
+      # Same split as single-host-validation/docker-compose.yml.
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: https://localhost:9443/realms/mtls-demo
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/mtls-demo/protocol/openid-connect/certs
+      SERVER_PORT: "8444"
+    volumes:
+      - ./certs/generated/ca:/certs/ca:ro
+      - ./certs/generated/resource-server:/certs/resource-server:ro
+    ports:
+      - "127.0.0.1:9444:8444"
+    depends_on:
+      - keycloak
+    restart: on-failure

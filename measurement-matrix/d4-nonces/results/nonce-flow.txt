@@ -1,0 +1,3 @@
+no nonce            -> 401 'DPoP error="use_dpop_nonce", error_description="Resource server requires nonce in DPoP proof", algs="RS256 RS384 RS512 PS256 PS384 PS512 ES256 ES384 ES512"' nonce=True
+with nonce          -> 200 rotated=True
+replay              -> 401 'DPoP error="use_dpop_nonce", error_description="nonce claim is invalid", algs="RS256 RS384 RS512 PS256 PS384 PS512 ES256 ES384 ES512"'

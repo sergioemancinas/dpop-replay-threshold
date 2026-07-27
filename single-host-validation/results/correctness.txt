@@ -1,0 +1,38 @@
+
+Preconditions
+  PASS  token_type is DPoP                                   expected DPoP, got DPoP 
+  PASS  access token carries cnf.jkt bound to client key     expected HEXeFkRBeK-ZFhfjIWqABruW7gN0GuQzPnXDt_DwugU, got HEXeFkRBeK-ZFhfjIWqABruW7gN0GuQzPnXDt_DwugU 
+
+Baseline
+  PASS  valid proof accepted                                 expected 200, got 200 
+
+jti single-use (RFC 9449 Sec. 11.1)
+  PASS  same proof replayed at idle is rejected              expected 401, got 401 
+  PASS  fresh jti accepted after a rejection                 expected 200, got 200 
+  PASS  absent jti claim rejected                            expected 401, got 401 
+  PASS  blank jti claim rejected                             expected 401, got 401 
+
+iat acceptance window (JwtIssuedAtValidator, clockSkew 60 s)
+  PASS  iat 30 s in the past accepted                        expected 200, got 200 
+  PASS  iat 120 s in the past rejected                       expected 401, got 401 
+  PASS  clock skew -2 s tolerated                            expected 200, got 200 
+  PASS  clock skew +2 s tolerated                            expected 200, got 200 
+
+iat window edges (60 s boundary)
+  PASS  iat at window minus 1 s accepted                     expected 200, got 200 boundary
+  PASS  iat at window plus 1 s rejected                      expected 401, got 401 boundary
+
+Binding claims
+  PASS  htm mismatch rejected                                expected 401, got 401 
+  PASS  htu mismatch rejected                                expected 401, got 401 
+  PASS  missing ath rejected                                 expected 401, got 401 
+  PASS  ath mismatch rejected                                expected 401, got 401 
+
+Token presentation
+  PASS  DPoP-bound token presented as Bearer rejected        expected 401, got 401 
+
+Not executed in the single-host configuration
+  SKIP  jti rejection across replicas                        requires 3 replicas, future work
+  SKIP  Redis primary loss fails closed                      requires Redis, future work
+
+18 passed, 0 failed, 2 skipped

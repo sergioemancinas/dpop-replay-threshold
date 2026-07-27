@@ -1,0 +1,36 @@
+Local invariants (no containers required)
+  [PASS] x5t#S256 of client-good matches openssl SHA-256 of the DER: expected 'EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8', got 'EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8'
+  [PASS] x5t#S256 of client-bad matches openssl SHA-256 of the DER: expected '0-yrNEutQ3dxevj9OHiv0Vf80HCls37cpdu3yUP45bk', got '0-yrNEutQ3dxevj9OHiv0Vf80HCls37cpdu3yUP45bk'
+  [PASS] Envoy Hash is hex of the same digest as x5t#S256: expected 'EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8', got 'EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8'
+  [PASS] Envoy Hash is not byte-identical to x5t#S256: expected False, got False  (hex versus base64url, so a naive string compare always fails)
+  [PASS] Envoy percent-encoding round-trips: expected '-----BEGIN CERTIFICATE-----\nMIIB3zCCAYWgAwIBAgIUZ/e+dFNbun2FYu489/N..., got '-----BEGIN CERTIFICATE-----\nMIIB3zCCAYWgAwIBAgIUZ/e+dFNbun2FYu489/N...
+  [PASS] undecoded XFCC Cert has no usable PEM header: expected False, got False  (the armour arrives as -----BEGIN%20CERTIFICATE-----%0A)
+  [PASS] encoded form contains the mangled header: expected True, got True
+  [PASS] client-good and client-bad have different thumbprints: expected True, got True
+  [PASS] manifest thumbprint agrees with recomputation: expected 'EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8', got 'EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8'
+
+Preconditions
+  [PASS] Envoy refuses a connection with no client certificate: expected 'connection refused at TLS', got 'connection refused at TLS'  (ReadError)
+  [PASS] no token is rejected: expected 401, got 401
+
+Listener A, complete propagation (Cert and Chain present)
+  [PASS] X1 strict  legit certificate accepted: expected 200, got 200  (propagation=installed token=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8 presented=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8)
+  [PASS] X1 strict  wrong certificate rejected: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Invalid SHA-256 Thumbprint for X509Certificate.", error_u)
+  [PASS] X1 lenient legit certificate accepted: expected 200, got 200  (propagation=installed token=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8 presented=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8)
+  [PASS] X1 lenient wrong certificate rejected: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Invalid SHA-256 Thumbprint for X509Certificate.", error_u)
+  [PASS] X2 strict  legit certificate rejected: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Unable to obtain X509Certificate from current request.", )
+  [PASS] X2 strict  wrong certificate rejected: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Unable to obtain X509Certificate from current request.", )
+  [PASS] X2 lenient legit certificate accepted: expected 200, got 200  (propagation=cert-field-unparseable token=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8 presented=None)
+  [PASS] X2 lenient WRONG certificate also accepted: expected 200, got 200  (propagation=cert-field-unparseable token=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8 presented=None)
+
+Listener B, lossy propagation (Subject, URI, DNS only; no Cert)
+  [PASS] B strict  legit certificate rejected: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Unable to obtain X509Certificate from current request.", )
+  [PASS] B lenient legit certificate accepted: expected 200, got 200  (propagation=xfcc-without-cert-field token=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8 presented=None)
+  [PASS] B lenient WRONG certificate also accepted: expected 200, got 200  (propagation=xfcc-without-cert-field token=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8 presented=None)
+
+Confirmation semantics and header trust
+  [PASS] unbound token accepted under X1 strict: expected 200, got 200  (propagation=installed token=None presented=EX4a90UCQ6lOf8q0nK-c6HjF_GRVARZhvQNwdHkpA_8)
+  [PASS] forged XFCC header ignored under X1 strict: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Invalid SHA-256 Thumbprint for X509Certificate.", error_u)
+  [PASS] forged XFCC header ignored under X1 lenient: expected 401, got 401  (Bearer error="invalid_token", error_description="An error occurred while attempting to decode the Jwt: Invalid SHA-256 Thumbprint for X509Certificate.", error_u)
+
+25 passed, 0 failed, 0 errored

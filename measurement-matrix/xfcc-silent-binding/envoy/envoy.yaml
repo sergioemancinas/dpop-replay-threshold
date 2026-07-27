@@ -1,0 +1,167 @@
+# Envoy is the TLS-terminating proxy for conditions X1 and X2.
+#
+# Why Envoy rather than NGINX: X-Forwarded-Client-Cert is Envoy's header. Envoy defines
+# it, Envoy's HTTP connection manager emits it, and the field grammar (By, Hash, Cert,
+# Chain, Subject, URI, DNS) is Envoy's. NGINX has no XFCC; it exposes $ssl_client_cert
+# and $ssl_client_escaped_cert, with different names, a different escaping rule and no
+# multi-hop element structure. Using NGINX and calling the result XFCC would be a
+# reconstruction of Envoy's convention rather than the convention itself. The equivalent
+# NGINX configuration is given in the README for completeness.
+#
+# Two listeners, differing only in set_current_client_cert_details. Four upstream
+# clusters, selected by path prefix, differing only in the resource server's
+# configuration. That keeps one variable per axis.
+
+admin:
+  # Container-local only. Not published to the host.
+  address:
+    socket_address: { address: 127.0.0.1, port_value: 9901 }
+
+static_resources:
+
+  listeners:
+
+    # ------------------------------------------------------------------
+    # Listener A: complete propagation.
+    # Cert and Chain are present, so the application can recover the DER and
+    # compute the RFC 8705 section 3.1 thumbprint.
+    # ------------------------------------------------------------------
+    - name: xfcc_complete
+      address:
+        socket_address: { address: 0.0.0.0, port_value: 10443 }
+      filter_chains:
+        - transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              require_client_certificate: true
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain: { filename: /etc/envoy/pki/server.crt }
+                    private_key: { filename: /etc/envoy/pki/server.key }
+                validation_context:
+                  # client-good and client-bad are both signed by this CA, so both
+                  # complete the handshake. The wrong-certificate case must therefore be
+                  # rejected by the token binding check, not by TLS.
+                  trusted_ca: { filename: /etc/envoy/pki/ca.crt }
+          filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: xfcc_complete
+                # SANITIZE_SET, not APPEND_FORWARD: any x-forwarded-client-cert the
+                # client sent is discarded and replaced with Envoy's own. Without this
+                # the header is client-controlled, which is the shape of
+                # CVE-2024-10039. test/test_xfcc.py asserts that a forged header is
+                # ignored.
+                forward_client_cert_details: SANITIZE_SET
+                set_current_client_cert_details:
+                  subject: true
+                  cert: true
+                  chain: true
+                  uri: true
+                  dns: true
+                route_config: &routes
+                  name: cells
+                  virtual_hosts:
+                    - name: cells
+                      domains: ["*"]
+                      routes:
+                        - match: { prefix: "/x1-strict/" }
+                          route: { cluster: rs_x1_strict, prefix_rewrite: "/" }
+                        - match: { prefix: "/x1-lenient/" }
+                          route: { cluster: rs_x1_lenient, prefix_rewrite: "/" }
+                        - match: { prefix: "/x2-strict/" }
+                          route: { cluster: rs_x2_strict, prefix_rewrite: "/" }
+                        - match: { prefix: "/x2-lenient/" }
+                          route: { cluster: rs_x2_lenient, prefix_rewrite: "/" }
+                http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+    # ------------------------------------------------------------------
+    # Listener B: lossy propagation, first limb of the failure class.
+    # The header is present and carries Subject, URI, DNS and Hash, but no Cert and no
+    # Chain. Identity metadata survives the hop; the certificate does not. An
+    # application that needs the DER to compute x5t#S256 has nothing to work with.
+    #
+    # This is a plausible misconfiguration rather than an exotic one: Subject and DNS
+    # are what most deployments actually consume, and cert/chain default to false.
+    # ------------------------------------------------------------------
+    - name: xfcc_metadata_only
+      address:
+        socket_address: { address: 0.0.0.0, port_value: 10444 }
+      filter_chains:
+        - transport_socket:
+            name: envoy.transport_sockets.tls
+            typed_config:
+              "@type": type.googleapis.com/envoy.extensions.transport_sockets.tls.v3.DownstreamTlsContext
+              require_client_certificate: true
+              common_tls_context:
+                tls_certificates:
+                  - certificate_chain: { filename: /etc/envoy/pki/server.crt }
+                    private_key: { filename: /etc/envoy/pki/server.key }
+                validation_context:
+                  trusted_ca: { filename: /etc/envoy/pki/ca.crt }
+          filters:
+            - name: envoy.filters.network.http_connection_manager
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager.v3.HttpConnectionManager
+                stat_prefix: xfcc_metadata_only
+                forward_client_cert_details: SANITIZE_SET
+                set_current_client_cert_details:
+                  subject: true
+                  uri: true
+                  dns: true
+                route_config: *routes
+                http_filters:
+                  - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
+
+  clusters:
+
+    - name: rs_x1_strict
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: rs_x1_strict
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: { address: rs-x1-strict, port_value: 8082 }
+
+    - name: rs_x1_lenient
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: rs_x1_lenient
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: { address: rs-x1-lenient, port_value: 8082 }
+
+    - name: rs_x2_strict
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: rs_x2_strict
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: { address: rs-x2-strict, port_value: 8082 }
+
+    - name: rs_x2_lenient
+      type: STRICT_DNS
+      lb_policy: ROUND_ROBIN
+      load_assignment:
+        cluster_name: rs_x2_lenient
+        endpoints:
+          - lb_endpoints:
+              - endpoint:
+                  address:
+                    socket_address: { address: rs-x2-lenient, port_value: 8082 }

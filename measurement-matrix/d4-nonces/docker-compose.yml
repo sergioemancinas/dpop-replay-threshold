@@ -1,0 +1,48 @@
+name: oauth-replay-d4-nonces
+
+# Host ports are deliberately disjoint from the single-host-validation stack
+# (8080, 8081, 9000) so both can exist on one Docker daemon without collision.
+#
+# NOT EXECUTED. This file has been validated with `docker compose config` only. The
+# executed evidence for D4 is the JVM test suite under resource-server/src/test.
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.1
+    command:
+      - start-dev
+      - --import-realm
+      - --features=dpop
+      # Pinned so the iss claim is identical from the host and from inside the network.
+      # Must match the published host port, not the container port.
+      - --hostname=http://localhost:8090
+      - --hostname-backchannel-dynamic=false
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      # Reused, not copied. The realm is identical to D1; D4 differs only in the resource
+      # server. Keycloak 26.6.1 has no authorization-server nonce support to configure
+      # (keycloak/keycloak#39042 is open), so nothing in the realm changes for this
+      # condition.
+      - ../../single-host-validation/keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    ports:
+      - "127.0.0.1:8090:8080"
+      - "127.0.0.1:9010:9000"
+
+  resource-server:
+    build: ./resource-server
+    environment:
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8090/realms/dpop-demo
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/dpop-demo/protocol/openid-connect/certs
+      SERVER_PORT: "8091"
+      # false selects the library-default configuration, the D1 control.
+      D4_NONCE_ENABLED: "true"
+      D4_NONCE_TTL: "300s"
+      D4_NONCE_MAX_OUTSTANDING: "100000"
+    ports:
+      - "127.0.0.1:8091:8091"
+    depends_on:
+      - keycloak
+    restart: on-failure

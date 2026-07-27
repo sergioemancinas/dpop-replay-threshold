@@ -1,0 +1,4 @@
+# Key material is generated at run time by certs/gen-certs.sh and is never committed.
+# Nothing under this path is a credential for any real system, but committing private
+# keys invites them to be mistaken for one.
+certs/generated/

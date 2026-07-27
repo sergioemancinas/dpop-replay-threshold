@@ -1,0 +1,97 @@
+name: oauth-replay-d2
+
+# Host ports are deliberately offset from the single-host stack (8080, 8081, 9000) so both
+# can be up at once without colliding.
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.1
+    command:
+      - start-dev
+      - --import-realm
+      - --features=dpop
+      # Pin the issuer so the token's iss claim is identical whether the caller reaches
+      # Keycloak from the host or from inside the compose network.
+      - --hostname=http://localhost:8180
+      - --hostname-backchannel-dynamic=false
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    ports:
+      - "127.0.0.1:8180:8080"
+      - "127.0.0.1:9100:9000"
+
+  redis:
+    image: redis:7-alpine
+    # No persistence. The jti set is ephemeral by construction: an entry only has to
+    # outlive the iat acceptance window of the proof that created it.
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "127.0.0.1:6479:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  # Three replicas are declared explicitly rather than with deploy.replicas, because each
+  # needs its own NODE_ID and its own name in the NGINX upstream. They share one build
+  # context and one image tag, so the image is built once.
+  rs-1:
+    build: ./resource-server
+    image: d2-dpop-resource-server:1.0.0
+    env_file: ./resource-server.env
+    environment:
+      NODE_ID: rs-1
+      DPOP_JTI_CACHE: ${DPOP_JTI_CACHE:-default}
+    depends_on:
+      keycloak:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  rs-2:
+    build: ./resource-server
+    image: d2-dpop-resource-server:1.0.0
+    env_file: ./resource-server.env
+    environment:
+      NODE_ID: rs-2
+      DPOP_JTI_CACHE: ${DPOP_JTI_CACHE:-default}
+    depends_on:
+      keycloak:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  rs-3:
+    build: ./resource-server
+    image: d2-dpop-resource-server:1.0.0
+    env_file: ./resource-server.env
+    environment:
+      NODE_ID: rs-3
+      DPOP_JTI_CACHE: ${DPOP_JTI_CACHE:-default}
+    depends_on:
+      keycloak:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: on-failure
+
+  proxy:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    # Container and host port are kept identical. The client signs htu with the port it
+    # dialled, and the resource server rebuilds that URL from the Host header, so any
+    # mismatch would fail htu validation rather than the jti check under test.
+    ports:
+      - "127.0.0.1:8190:8190"
+    depends_on:
+      - rs-1
+      - rs-2
+      - rs-3

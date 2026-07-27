@@ -1,0 +1,42 @@
+name: ci
+
+# Runs only the test suites that need no running services.
+#
+# In scope here: the statistical-analysis pipeline under
+# measurement-matrix/analysis/, 145 pytest tests against synthetic fixtures
+# (see measurement-matrix/analysis/README.md). No Docker, no Keycloak, no
+# resource server is started.
+#
+# Deliberately NOT run here:
+#   - Every docker compose stack (D1, D2, C0/M1, X1/X2, D4). These need a
+#     Docker daemon and bring up live services; they are reproduced by hand
+#     per the per-directory READMEs and reproduce.sh, and their outputs are
+#     committed under each results/ directory.
+#   - The Maven resource-server test suites in
+#       measurement-matrix/d2-distributed-cache/resource-server
+#       measurement-matrix/d4-nonces/resource-server
+#       measurement-matrix/xfcc-silent-binding/resource-server
+#     These `mvn test` suites need NO running services (MockMvc / context
+#     boot only), but they DO need network access to download dependencies
+#     from Maven Central, so they are left out of this minimal workflow.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  analysis-pytest:
+    name: analysis pipeline (pytest, no services)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install analysis dependencies
+        run: python -m pip install --upgrade pip -r measurement-matrix/analysis/requirements.txt
+
+      - name: Run analysis test suite
+        run: python -m pytest measurement-matrix/analysis -q

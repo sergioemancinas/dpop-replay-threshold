@@ -1,0 +1,39 @@
+name: oauth-replay-single-host
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6.1
+    command:
+      - start-dev
+      - --import-realm
+      - --features=dpop
+      # Pin the issuer so the token's iss claim is identical whether the caller
+      # reaches Keycloak from the host or from inside the compose network.
+      - --hostname=http://localhost:8080
+      - --hostname-backchannel-dynamic=false
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HEALTH_ENABLED: "true"
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:9000:9000"
+
+  resource-server:
+    build: ./resource-server
+    environment:
+      # Single node, default in-process JtiCache. No Redis by design:
+      # the bounded process-local cache is the object under test.
+      #
+      # Issuer is validated as localhost:8080 (what Keycloak mints), while keys are
+      # fetched over the compose network where that host name does not resolve.
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8080/realms/dpop-demo
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/dpop-demo/protocol/openid-connect/certs
+      SERVER_PORT: "8081"
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      - keycloak
+    restart: on-failure

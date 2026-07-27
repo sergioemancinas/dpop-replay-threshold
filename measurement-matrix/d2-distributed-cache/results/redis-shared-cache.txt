@@ -1,0 +1,27 @@
+
+Preconditions
+  PASS  token_type is DPoP                                       got DPoP
+  PASS  access token carries cnf.jkt bound to client key         got TQxkLqEgJBkmljP6PUj7MtpwO7h5SLSC9bjluDKzkPY
+  PASS  stack reports jti cache mode 'redis'                     replicas report 'redis'
+  PASS  proxy fans out over 3 distinct replicas                  saw ['rs-1', 'rs-2', 'rs-3']
+  PASS  unique proofs accepted on every replica                  statuses [200, 200, 200, 200, 200, 200]
+
+Replay sequence: 6 presentations of one proof, 1 s apart (1 req/s)
+    #1 HTTP 200 from rs-2
+    #2 HTTP 401 from rs-3
+    #3 HTTP 401 from rs-1
+    #4 HTTP 401 from rs-2
+    #5 HTTP 401 from rs-3
+    #6 HTTP 401 from rs-1
+  PASS  whole sequence stayed inside the 60 s iat window         probe age 5 s at the last presentation
+  PASS  first presentation accepted                              HTTP 200 from rs-2
+
+  PASS  exactly one presentation accepted                        accepted by ['rs-2']
+  PASS  replay REJECTED on a replica that never saw the proof    4 of 5 later presentations
+  PASS  every later presentation rejected                        statuses [401, 401, 401, 401, 401]
+
+Shared-cache partition behaviour
+  PASS  fresh unique proof refused while Redis is down           statuses [401, 401, 401]
+  PASS  service recovers once Redis returns                      
+
+12 passed, 0 failed, 0 inconclusive, 0 skipped

@@ -1,0 +1,309 @@
+{
+  "cache_bound_N": 1000,
+  "iat_window_W_s": 60,
+  "replay_at_s": 58.0,
+  "predicted_crossover_req_s": 17.24,
+  "limiting_threshold_N_over_W_req_s": 16.67,
+  "results": [
+    {
+      "rate_req_s": 5.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.81,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 290,
+      "insertions_2xx": 290,
+      "load_status_counts": {
+        "200": 290
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 5.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.81,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 290,
+      "insertions_2xx": 290,
+      "load_status_counts": {
+        "200": 290
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 10.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.91,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 580,
+      "insertions_2xx": 580,
+      "load_status_counts": {
+        "200": 580
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 10.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.91,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 580,
+      "insertions_2xx": 580,
+      "load_status_counts": {
+        "200": 580
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 15.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.94,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 870,
+      "insertions_2xx": 870,
+      "load_status_counts": {
+        "200": 870
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 15.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.95,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 870,
+      "insertions_2xx": 870,
+      "load_status_counts": {
+        "200": 870
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 16.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.95,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 928,
+      "insertions_2xx": 928,
+      "load_status_counts": {
+        "200": 928
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 16.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.94,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 928,
+      "insertions_2xx": 928,
+      "load_status_counts": {
+        "200": 928
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 17.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 986,
+      "insertions_2xx": 986,
+      "load_status_counts": {
+        "200": 986
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 17.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 986,
+      "insertions_2xx": 986,
+      "load_status_counts": {
+        "200": 986
+      },
+      "replay_status": 401,
+      "replay_admitted": false,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 18.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.95,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1044,
+      "insertions_2xx": 1044,
+      "load_status_counts": {
+        "200": 1044
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 18.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1044,
+      "insertions_2xx": 1044,
+      "load_status_counts": {
+        "200": 1044
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 19.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1102,
+      "insertions_2xx": 1102,
+      "load_status_counts": {
+        "200": 1102
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 19.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1102,
+      "insertions_2xx": 1102,
+      "load_status_counts": {
+        "200": 1102
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 20.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1160,
+      "insertions_2xx": 1160,
+      "load_status_counts": {
+        "200": 1160
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 20.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.96,
+      "probe_age_at_replay_s": 57,
+      "requests_sent": 1160,
+      "insertions_2xx": 1160,
+      "load_status_counts": {
+        "200": 1160
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 25.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.98,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1450,
+      "insertions_2xx": 1450,
+      "load_status_counts": {
+        "200": 1450
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 25.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.97,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 1450,
+      "insertions_2xx": 1450,
+      "load_status_counts": {
+        "200": 1450
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 2
+    },
+    {
+      "rate_req_s": 40.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.99,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 2320,
+      "insertions_2xx": 2320,
+      "load_status_counts": {
+        "200": 2320
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 1
+    },
+    {
+      "rate_req_s": 40.0,
+      "replay_at_s": 58.0,
+      "elapsed_s": 57.98,
+      "probe_age_at_replay_s": 58,
+      "requests_sent": 2320,
+      "insertions_2xx": 2320,
+      "load_status_counts": {
+        "200": 2320
+      },
+      "replay_status": 200,
+      "replay_admitted": true,
+      "iat_window_respected": true,
+      "repeat": 2
+    }
+  ]
+}

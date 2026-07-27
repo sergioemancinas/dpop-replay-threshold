@@ -1,0 +1,56 @@
+{
+  "realm": "mtls-demo",
+  "enabled": true,
+  "sslRequired": "none",
+  "accessTokenLifespan": 1800,
+  "clients": [
+    {
+      "clientId": "bearer-client",
+      "description": "C0 control. Plain bearer tokens, no sender constraint of any kind.",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "protocol": "openid-connect",
+      "attributes": {
+        "tls.client.certificate.bound.access.tokens": "false"
+      }
+    },
+    {
+      "clientId": "mtls-client",
+      "description": "M1. RFC 8705 tls_client_auth with certificate-bound access tokens.",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "protocol": "openid-connect",
+      "clientAuthenticatorType": "client-x509",
+      "attributes": {
+        "x509.subjectdn": "CN=mtls-client",
+        "x509.allow.regex.pattern.comparison": "false",
+        "tls.client.certificate.bound.access.tokens": "true",
+        "use.refresh.tokens": "false"
+      }
+    }
+  ],
+  "users": [
+    {
+      "username": "testuser",
+      "enabled": true,
+      "emailVerified": true,
+      "email": "testuser@example.invalid",
+      "firstName": "Test",
+      "lastName": "User",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "testpass",
+          "temporary": false
+        }
+      ]
+    }
+  ]
+}

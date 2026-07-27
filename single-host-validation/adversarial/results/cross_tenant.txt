@@ -1,0 +1,12 @@
+E2: cross-tenant eviction (quiet variant)
+  co-tenant sent 1050 legitimate requests in 1.3 s
+  co-tenant response codes: {200: 1050}
+
+  PASS  victim proof, first use                          expected 200, got 200
+  PASS  victim replay before co-tenant traffic           expected 401, got 401
+  PASS  victim replay after 1000+ co-tenant 200s         expected 200, got 200
+
+  Victim replay ADMITTED after eviction driven entirely by HTTP 200 traffic.
+  No rejected request, no forged proof, no stolen credential on the
+  eviction path. The shared static cache has no tenant partition, so P in
+  N >= P*W must be the AGGREGATE rate across every client on the node.

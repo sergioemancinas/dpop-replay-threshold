@@ -1,0 +1,33 @@
+server:
+  port: ${SERVER_PORT:8081}
+  tomcat:
+    threads:
+      max: 200
+
+spring:
+  application:
+    name: dpop-resource-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
+          # FAPI 2.0 mandates ES256. RS256 is retained only so a misconfigured realm
+          # fails on the algorithm assertion rather than silently at key selection.
+          jws-algorithms:
+            - ES256
+            - RS256
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    org.springframework.security: INFO

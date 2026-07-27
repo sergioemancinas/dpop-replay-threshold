@@ -1,0 +1,86 @@
+{
+  "N": 1000,
+  "plan": "fixed R, swept t",
+  "rows": [
+    {
+      "rate": 20,
+      "t": 40,
+      "inserts": 801,
+      "sent": 801,
+      "replay": 401,
+      "admitted": false,
+      "age": 40,
+      "in_window": true
+    },
+    {
+      "rate": 20,
+      "t": 48,
+      "inserts": 961,
+      "sent": 961,
+      "replay": 401,
+      "admitted": false,
+      "age": 48,
+      "in_window": true
+    },
+    {
+      "rate": 20,
+      "t": 52,
+      "inserts": 1041,
+      "sent": 1041,
+      "replay": 200,
+      "admitted": true,
+      "age": 52,
+      "in_window": true
+    },
+    {
+      "rate": 20,
+      "t": 58,
+      "inserts": 1161,
+      "sent": 1161,
+      "replay": 200,
+      "admitted": true,
+      "age": 58,
+      "in_window": true
+    },
+    {
+      "rate": 40,
+      "t": 18,
+      "inserts": 721,
+      "sent": 721,
+      "replay": 401,
+      "admitted": false,
+      "age": 18,
+      "in_window": true
+    },
+    {
+      "rate": 40,
+      "t": 24,
+      "inserts": 961,
+      "sent": 961,
+      "replay": 401,
+      "admitted": false,
+      "age": 24,
+      "in_window": true
+    },
+    {
+      "rate": 40,
+      "t": 28,
+      "inserts": 1121,
+      "sent": 1121,
+      "replay": 200,
+      "admitted": true,
+      "age": 28,
+      "in_window": true
+    },
+    {
+      "rate": 40,
+      "t": 35,
+      "inserts": 1401,
+      "sent": 1401,
+      "replay": 200,
+      "admitted": true,
+      "age": 35,
+      "in_window": true
+    }
+  ]
+}

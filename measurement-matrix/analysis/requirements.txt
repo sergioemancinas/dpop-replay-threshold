@@ -1,0 +1,5 @@
+# Statistical pipeline for the (NOT EXECUTED) measurement matrix.
+# Versions are the ones the pipeline was developed and tested against.
+numpy>=1.26,<3
+scipy>=1.11
+pytest>=7.4

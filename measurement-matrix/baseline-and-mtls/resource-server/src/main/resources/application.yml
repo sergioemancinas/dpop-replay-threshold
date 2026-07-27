@@ -1,0 +1,46 @@
+server:
+  port: ${SERVER_PORT:8444}
+  ssl:
+    enabled: true
+    certificate: ${RS_TLS_CERT:file:/certs/resource-server/rs.crt}
+    certificate-private-key: ${RS_TLS_KEY:file:/certs/resource-server/rs.key}
+    # Client CA. Ssl.ClientAuth is NONE, WANT or NEED; the appendix note on
+    # client-auth is "Requires a trust store", so this property is mandatory here.
+    trust-certificate: ${RS_TLS_TRUST:file:/certs/ca/ca.pem}
+    #
+    # WANT, not NEED, and this is load-bearing for the M1 assertions.
+    #
+    # NEED makes Tomcat abort the handshake when no client certificate is offered.
+    # The no-certificate replay attempt would then fail at the transport, and the
+    # experiment would prove only that the socket refused the peer. WANT lets the
+    # request reach the application, so the 401 is attributable to RFC 8705
+    # section 3.1 token validation, which is the claim under test.
+    client-auth: ${RS_CLIENT_AUTH:want}
+
+spring:
+  application:
+    name: baseline-mtls-resource-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
+          # Keycloak signs with RS256 by default. ES256 is listed so a realm that is
+          # switched to it fails on an assertion rather than at key selection.
+          jws-algorithms:
+            - RS256
+            - ES256
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    org.springframework.security: INFO

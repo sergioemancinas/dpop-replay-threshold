@@ -1,0 +1,38 @@
+server:
+  port: ${SERVER_PORT:8091}
+  tomcat:
+    threads:
+      max: 200
+
+spring:
+  application:
+    name: d4-nonce-resource-server
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI:}
+          jws-algorithms:
+            - ES256
+            - RS256
+
+d4:
+  nonce:
+    # false selects BaselineSecurityConfig, the library-default D1 control.
+    enabled: ${D4_NONCE_ENABLED:true}
+    ttl: ${D4_NONCE_TTL:300s}
+    max-outstanding: ${D4_NONCE_MAX_OUTSTANDING:100000}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+logging:
+  level:
+    org.springframework.security: INFO

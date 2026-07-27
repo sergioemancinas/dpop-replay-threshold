@@ -1,0 +1,12 @@
+E1: attacker-supplied eviction (loud variant)
+  flood of 1050 proofs took 1.3 s at idle
+  flood response codes: {401: 1050}  (all 401 = rejected on jkt as expected)
+
+  PASS  victim proof, first use                              expected 200, got 200
+  PASS  victim proof replayed at idle, pre-flood             expected 401, got 401
+  PASS  victim proof replayed after 1000+ attacker inserts   expected 200, got 200
+
+  Replay was ADMITTED after the attacker flood, at idle.
+  R* is a budget the attacker spends, not a property of deployment load.
+  Every flood request was rejected, so no anomaly-free path was used here.
+  This variant is loud: 1000+ 401s are exactly what detection sees.
