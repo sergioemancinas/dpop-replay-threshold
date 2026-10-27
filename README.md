@@ -1,9 +1,12 @@
 # DPoP Replay-Cache Threshold: Artifact
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23687979.svg)](https://doi.org/10.5281/zenodo.23687979)
+
 Code and results for *Operational Realities of Sender-Constrained OAuth: Replay-State
 Scaling Thresholds and Silent Binding Failures in Distributed Resource-Server Deployments*.
 Published in *Kölner Beiträge zur technischen Informatik*, Band 3/2026, TH Köln,
-[doi:10.57684/COS-1495](https://doi.org/10.57684/COS-1495).
+[doi:10.57684/COS-1495](https://doi.org/10.57684/COS-1495). The artifact is archived on Zenodo,
+[doi:10.5281/zenodo.23687979](https://doi.org/10.5281/zenodo.23687979) (all versions).
 
 > **Status, October 2026.** Spring Security 7.0.7 and 7.1.1, released 2026-08-20, replace
 > the cache studied here with `DPoPProofReplayValidator`: 100,000 entries, at most 1000 per
