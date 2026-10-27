@@ -8,7 +8,8 @@ authors:
     alias: sergioemancinas
 repository-code: "https://github.com/sergioemancinas/dpop-replay-threshold"
 license: Apache-2.0
-# doi: 10.5281/zenodo.XXXXXXX   # add the Zenodo archive DOI once minted
+# Zenodo concept DOI: resolves to the latest archived release.
+doi: "10.5281/zenodo.23687979"
 preferred-citation:
   type: article
   title: "Operational Realities of Sender-Constrained OAuth: Replay-State Scaling Thresholds and Silent Binding Failures in Distributed Resource-Server Deployments"
