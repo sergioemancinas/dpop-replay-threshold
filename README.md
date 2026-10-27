@@ -11,9 +11,13 @@ Published in *Kölner Beiträge zur technischen Informatik*, Band 3/2026, TH Kö
 > **Status, October 2026.** Spring Security 7.0.7 and 7.1.1, released 2026-08-20, replace
 > the cache studied here with `DPoPProofReplayValidator`: 100,000 entries, at most 1000 per
 > client key, a ±30 s window, and a full cache rejects new proofs instead of evicting old
-> ones. The results below apply to Spring Security 6.5.x (6.5.11, the last open-source
-> 6.5 release, still ships the old cache), 7.0.0 to 7.0.6, and 7.1.0. On those versions,
-> upgrade to 7.0.7, 7.1.1 or later.
+> ones. The fix is published as
+> [CVE-2026-41707](https://spring.io/security/cve-2026-41707/) (2026-08-20, credited to Yu
+> Bao, PayPal Cybersecurity Team), which describes the attacker-driven eviction of
+> Sec. 2 below. Affected: 6.5.0 to 6.5.11, 7.0.0 to 7.0.6, 7.1.0. Fixed: 7.0.7 and 7.1.1
+> (open source), 6.5.12 (Enterprise Support only). The honest-traffic threshold, the
+> cross-tenant eviction and the sizing rule below are not part of that advisory.
+> [`spring-7-followup/`](spring-7-followup/) re-runs the stack on 7.1.2.
 
 ## Overview
 

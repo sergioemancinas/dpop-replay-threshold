@@ -45,6 +45,20 @@ python3 probe.py all      # about 25 min; writes results/A.json, B.json, C.json
 docker compose down -v
 ```
 
+## Deviation: DPoP is opt-in in 7.x
+
+The first run (2026-10-27) rejected every request, including the first use of a fresh
+proof, with `WWW-Authenticate: Bearer`. In 7.1.2, `OAuth2ResourceServerConfigurer`
+installs DPoP only when `.dPoP(...)` is called; 6.5 installed it whenever
+`DPoPProofJwtDecoderFactory` was on the classpath. The resource server now calls
+`.dPoP(Customizer.withDefaults())`, the only change to the code that was committed with
+the predictions, and that run's output was discarded.
+
+Checked on the server without `.dPoP(...)`: a DPoP-bound access token sent as a plain
+`Bearer` token, without a proof, is rejected with 401 `invalid_token`. An application
+upgraded from 6.5 to 7.x without adding `.dPoP(...)` therefore fails loudly; it does
+not silently accept DPoP-bound tokens as bearer tokens.
+
 ## Results
 
 Not yet run.

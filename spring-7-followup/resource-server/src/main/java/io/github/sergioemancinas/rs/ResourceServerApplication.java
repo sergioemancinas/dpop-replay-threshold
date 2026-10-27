@@ -35,7 +35,8 @@ public class ResourceServerApplication {
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers("/actuator/health").permitAll()
 				.anyRequest().authenticated())
-			.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+			// 7.x installs DPoP only when asked; 6.5 installed it whenever the class was present.
+			.oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()).dPoP(Customizer.withDefaults()));
 		return http.build();
 	}
 
