@@ -1,0 +1,63 @@
+{
+ "replay_at_s": 28.0,
+ "window_s": 30,
+ "results": [
+  {
+   "rate_req_s": 5,
+   "probe_first_use": 200,
+   "load_status_counts": {
+    "200": 140
+   },
+   "replay_status": 401,
+   "replay_admitted": false,
+   "probe_age_at_replay_s": 28,
+   "iat_window_respected": true
+  },
+  {
+   "rate_req_s": 17,
+   "probe_first_use": 200,
+   "load_status_counts": {
+    "200": 476
+   },
+   "replay_status": 401,
+   "replay_admitted": false,
+   "probe_age_at_replay_s": 28,
+   "iat_window_respected": true
+  },
+  {
+   "rate_req_s": 18,
+   "probe_first_use": 200,
+   "load_status_counts": {
+    "200": 504
+   },
+   "replay_status": 401,
+   "replay_admitted": false,
+   "probe_age_at_replay_s": 28,
+   "iat_window_respected": true
+  },
+  {
+   "rate_req_s": 25,
+   "probe_first_use": 200,
+   "load_status_counts": {
+    "200": 700
+   },
+   "replay_status": 401,
+   "replay_admitted": false,
+   "probe_age_at_replay_s": 28,
+   "iat_window_respected": true
+  },
+  {
+   "rate_req_s": 40,
+   "probe_first_use": 200,
+   "load_status_counts": {
+    "200": 999,
+    "401": 121
+   },
+   "replay_status": 401,
+   "replay_admitted": false,
+   "probe_age_at_replay_s": 28,
+   "iat_window_respected": true
+  }
+ ],
+ "run_finished_utc": "2026-10-27T11:40:14Z"
+}
