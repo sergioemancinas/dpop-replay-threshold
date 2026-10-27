@@ -74,3 +74,13 @@ Sec. V-D is a deterministic outcome predicted from the Spring Security source an
 rest on pre-registration. H1–H4 have not been run. Release `v1.0.0`, archived on Zenodo on
 2026-10-27 ([doi:10.5281/zenodo.23687980](https://doi.org/10.5281/zenodo.23687980)), gives
 `PREREGISTRATION.md` an independent timestamp; no H1–H4 data predates it.
+
+## Post-publication code changes
+
+Changes to code that existed at publication (`v1.0.0`). None changes a committed result.
+
+| Date | Change | Reason |
+|------|--------|--------|
+| 2026-10-27 | D4 `DPoPNonceStore.consume` checks the key binding before spending the nonce, and spends it with a conditional remove. A test now asserts that a wrong-key attempt leaves the nonce usable for its owner; it fails on the old code. | The old code removed the nonce first, so a request under another key burned the nonce of the client it was issued to. Single use and key binding were already enforced; this only removes the burn. |
+| 2026-10-27 | D2 Redis TTL raised from 120 s to 125 s. | 120 s is tight only with synchronised clocks. Each replica checks `iat` on its own clock while Redis expires the key on its clock; the 5 s margin covers offset between them. The D2 results replay within seconds of first use, so their outcome does not depend on the TTL. |
+| 2026-10-27 | CI builds every resource server and runs the Maven test suites. | They were previously run by hand only. |

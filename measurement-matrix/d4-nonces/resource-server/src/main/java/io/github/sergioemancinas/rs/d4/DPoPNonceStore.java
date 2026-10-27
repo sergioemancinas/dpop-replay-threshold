@@ -102,14 +102,17 @@ public final class DPoPNonceStore {
 		if (nonce == null || jkt == null) {
 			return false;
 		}
-		Entry entry = this.outstanding.remove(nonce);
-		if (entry == null) {
+		Entry entry = this.outstanding.get(nonce);
+		// Check the key binding before spending the nonce, so a request under another key
+		// cannot burn the nonce of the client it was issued to.
+		if (entry == null || !entry.jkt().equals(jkt)) {
 			return false;
 		}
-		if (this.clock.instant().isAfter(entry.expiresAt())) {
+		// Conditional remove: of two concurrent requests with this nonce, exactly one wins.
+		if (!this.outstanding.remove(nonce, entry)) {
 			return false;
 		}
-		return entry.jkt().equals(jkt);
+		return !this.clock.instant().isAfter(entry.expiresAt());
 	}
 
 	int outstandingCount() {
