@@ -2,23 +2,17 @@ name: ci
 
 # Runs only the test suites that need no running services.
 #
-# In scope here: the statistical-analysis pipeline under
-# measurement-matrix/analysis/, 145 pytest tests against synthetic fixtures
-# (see measurement-matrix/analysis/README.md). No Docker, no Keycloak, no
-# resource server is started.
+# In scope here:
+#   - the statistical-analysis pipeline under measurement-matrix/analysis/, 145 pytest
+#     tests against synthetic fixtures (see measurement-matrix/analysis/README.md);
+#   - every resource server's Maven build, including the MockMvc / context-boot test
+#     suites of d2-distributed-cache, d4-nonces and xfcc-silent-binding.
+# No Docker, no Keycloak, no running resource server.
 #
-# Deliberately NOT run here:
-#   - Every docker compose stack (D1, D2, C0/M1, X1/X2, D4). These need a
-#     Docker daemon and bring up live services; they are reproduced by hand
-#     per the per-directory READMEs and reproduce.sh, and their outputs are
-#     committed under each results/ directory.
-#   - The Maven resource-server test suites in
-#       measurement-matrix/d2-distributed-cache/resource-server
-#       measurement-matrix/d4-nonces/resource-server
-#       measurement-matrix/xfcc-silent-binding/resource-server
-#     These `mvn test` suites need NO running services (MockMvc / context
-#     boot only), but they DO need network access to download dependencies
-#     from Maven Central, so they are left out of this minimal workflow.
+# Deliberately NOT run here: every docker compose stack (D1, D2, C0/M1, X1/X2, D4, the
+# Spring 7.1.2 follow-up). These bring up live services; they are reproduced by hand per
+# the per-directory READMEs and reproduce.sh, and their outputs are committed under each
+# results/ directory.
 
 on:
   push:
@@ -31,7 +25,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
@@ -40,3 +34,29 @@ jobs:
 
       - name: Run analysis test suite
         run: python -m pytest measurement-matrix/analysis -q
+
+  maven:
+    name: resource server build and tests (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - single-host-validation/resource-server
+          - measurement-matrix/baseline-and-mtls/resource-server
+          - measurement-matrix/d2-distributed-cache/resource-server
+          - measurement-matrix/d4-nonces/resource-server
+          - measurement-matrix/xfcc-silent-binding/resource-server
+          - spring-7-followup/resource-server
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Build and test
+        working-directory: ${{ matrix.module }}
+        run: mvn -B verify

@@ -32,13 +32,26 @@ it: "multiple servers behind a single endpoint have no shared state".
 ## Fact 2: the shared cache
 
 `RedisJtiClaimValidator` claims the identifier with a single
-`SET dpop:jti:<sha256(jti)> <node> EX 120 NX`. One round trip both tests and claims, so two
+`SET dpop:jti:<sha256(jti)> <node> EX 125 NX`. One round trip both tests and claims, so two
 replicas racing the same proof cannot both win. The `jti` is hashed before it becomes a key,
 matching what the library does with its own map.
 
 **TTL.** `JwtIssuedAtValidator` accepts `iat` within +/- 60 s of now. A proof first seen at
 `t0` carrying `iat = t0 + 60` stays `iat`-valid until `t0 + 120`, so 120 s is the tight lower
-bound on the entry's lifetime. Shorter and a proof could outlive its own cache entry.
+bound on the entry's lifetime with synchronised clocks. Shorter and a proof could outlive its
+own cache entry. Each replica checks `iat` against its own clock while Redis expires the key on
+its clock, so a replica running `d` seconds behind Redis keeps accepting the proof `d` seconds
+after the entry is gone. The TTL is therefore 125 s, a 5 s margin for clock offset. The
+committed results were recorded with 120 s; their outcomes do not depend on the TTL, because
+every replay in them happens within seconds of first use.
+
+**Ordering.** The shared entry is written only after the library has validated the proof and
+its binding (`htm`, `htu`, `iat`, `ath`, `jkt`), so a request that fails those checks never
+consumes a shared entry.
+
+**Limit.** One Redis instance, no replica. With Redis replication, an acknowledged `SET NX`
+can be lost on failover, which would let a proof be accepted twice; that case is not tested
+here.
 
 **Fail closed.** Any exception reaching the validator, connection refused or timeout,
 produces `invalid_dpop_proof`. Single use is the entire replay defence; with the shared cache

@@ -35,9 +35,10 @@ dpop:
     cache: ${DPOP_JTI_CACHE:default}
     key-prefix: "dpop:jti:"
     # JwtIssuedAtValidator accepts iat within +/- 60 s of now, so a proof first seen at t0
-    # with iat = t0 + 60 stays iat-valid until t0 + 120. 120 s is therefore the tight
-    # lower bound on how long the shared entry has to live.
-    redis-ttl-seconds: 120
+    # with iat = t0 + 60 stays iat-valid until t0 + 120. 120 s is the tight lower bound
+    # with synchronised clocks; each replica checks iat against its own clock while Redis
+    # expires the key on its clock, so 5 s are added for clock offset between them.
+    redis-ttl-seconds: 125
 
 node:
   id: ${NODE_ID:unknown}

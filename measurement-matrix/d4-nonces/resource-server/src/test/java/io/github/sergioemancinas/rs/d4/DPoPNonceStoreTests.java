@@ -30,6 +30,7 @@ class DPoPNonceStoreTests {
 		String nonce = store.issue(JKT);
 
 		assertThat(store.consume(nonce, "some-other-thumbprint")).isFalse();
+		assertThat(store.consume(nonce, JKT)).as("a wrong-key attempt does not burn the nonce").isTrue();
 	}
 
 	@Test
