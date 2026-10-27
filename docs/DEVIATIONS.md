@@ -71,5 +71,6 @@ as it is.
 
 What this affects: only the claim of a verifiable ordering. The single-host result of
 Sec. V-D is a deterministic outcome predicted from the Spring Security source and does not
-rest on pre-registration. H1–H4 have not been run. Before any H1–H4 measurement, the
-pre-registration will be archived with an independent timestamp (a Zenodo release).
+rest on pre-registration. H1–H4 have not been run. Release `v1.0.0`, archived on Zenodo on
+2026-10-27 ([doi:10.5281/zenodo.23687980](https://doi.org/10.5281/zenodo.23687980)), gives
+`PREREGISTRATION.md` an independent timestamp; no H1–H4 data predates it.
