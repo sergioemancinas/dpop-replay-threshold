@@ -52,3 +52,24 @@ Other limitations of the pre-registered plan, documented in
 
 Work that has not run yet is listed in the execution status table in
 `PREREGISTRATION.md`, not here.
+
+## Commit timestamps
+
+The paper's Appendix A states that the pre-registration commit `53e4ae2` (dated
+2026-07-27 12:34:48 UTC) precedes the first commit with measured data, `bbd4d22` (dated
+13:20:35 UTC), and that this ordering is verifiable from the repository history. It is not:
+
+- `bbd4d22` contains `single-host-validation/results/environment.txt`, which
+  `reproduce.sh` writes at the end of a run and which records `2026-07-27T16:34:15Z`,
+  three hours after the commit's own date.
+- The GitHub repository was created at 2026-07-27 19:00:05 UTC, after both commits
+  existed, so neither was public at its stated time.
+
+The commit dates therefore do not reflect when the contents were written, and the author
+cannot reconstruct how they were produced. Nothing is rewritten here; the history is left
+as it is.
+
+What this affects: only the claim of a verifiable ordering. The single-host result of
+Sec. V-D is a deterministic outcome predicted from the Spring Security source and does not
+rest on pre-registration. H1–H4 have not been run. Before any H1–H4 measurement, the
+pre-registration will be archived with an independent timestamp (a Zenodo release).
