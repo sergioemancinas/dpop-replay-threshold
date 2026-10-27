@@ -7,7 +7,7 @@
 # results to single-host-validation/results/.
 #
 # Runtime is roughly one minute per rate point. The default sweep is ten rates
-# with two repeats, so about twenty minutes.
+# with two repeats, so about twenty-five minutes, plus the first image build.
 
 set -euo pipefail
 

@@ -1,0 +1,7 @@
+# Certificate thumbprints (cnf x5t#S256) of throwaway test certificates printed in X1/X2 results; public values, not secrets.
+bbd4d22e9855be942dc4c53c72ed331443b40a3a:measurement-matrix/xfcc-silent-binding/results/xfcc-outcomes.txt:generic-api-key:17
+bbd4d22e9855be942dc4c53c72ed331443b40a3a:measurement-matrix/xfcc-silent-binding/results/xfcc-outcomes.txt:generic-api-key:19
+bbd4d22e9855be942dc4c53c72ed331443b40a3a:measurement-matrix/xfcc-silent-binding/results/xfcc-outcomes.txt:generic-api-key:23
+bbd4d22e9855be942dc4c53c72ed331443b40a3a:measurement-matrix/xfcc-silent-binding/results/xfcc-outcomes.txt:generic-api-key:24
+bbd4d22e9855be942dc4c53c72ed331443b40a3a:measurement-matrix/xfcc-silent-binding/results/xfcc-outcomes.txt:generic-api-key:28
+bbd4d22e9855be942dc4c53c72ed331443b40a3a:measurement-matrix/xfcc-silent-binding/results/xfcc-outcomes.txt:generic-api-key:29

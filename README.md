@@ -96,6 +96,7 @@ Every figure below is from a committed run under the named `results/` file.
 | C0 / M1 | bearer baseline, mTLS binding | 24 passed |
 | X1 / X2 | cert metadata across TLS termination | 25 passed |
 | D4 | single-use nonce enforcement | refuse, issue, accept, rotate, reject replay |
+| Spring 7.1.2 follow-up | the CVE-2026-41707 fix, predictions pushed before the run | replay and attacker flood closed; one client key capped at 1000 / 30 s ≈ 33 accepted req/s per node |
 
 At 17 req/s the sweep records 986 insertions, below the 1000 bound, and the replay is
 rejected; at 18 req/s it records 1044 and the replay succeeds.
@@ -126,7 +127,7 @@ history does not hold. See [`docs/DEVIATIONS.md`](docs/DEVIATIONS.md#commit-time
 Needs Docker with Compose and `python3` with `httpx` and `cryptography`.
 
 ```
-./reproduce.sh                         # full D1 sweep, ~30 min
+./reproduce.sh                         # full D1 sweep, ~25 min plus the first image build
 RATES=16,18 REPEATS=1 ./reproduce.sh   # smoke test, ~3 min, still straddles the threshold
 python3 single-host-validation/check_results.py   # verify a run against the model
 ```
@@ -144,6 +145,7 @@ docs/ARTIFACT-APPENDIX.md   claim-to-experiment map (USENIX template)
 docs/DEVIATIONS.md          departures from the plan, and a known flaw in it
 single-host-validation/     D1, plus adversarial/ (attacker, cross-tenant, sweeps)
 measurement-matrix/         D2, C0/M1, X1/X2, D4, and the analysis pipeline
+spring-7-followup/          D1 stack on Spring Security 7.1.2, predictions and results
 reproduce.sh                one-command D1 run
 ```
 
@@ -158,20 +160,28 @@ it is deployment guidance.
   purpose, to demonstrate a silent failure. Do not copy it.
 - All stacks use throwaway credentials and locally generated PKI, bound to localhost. Keys
   are generated at run time and never committed.
+- Dependencies are pinned to the releases under study, so the 6.5.5 stacks carry known CVEs
+  in Spring Boot 3.5.5, Tomcat, Jackson and Netty (a `trivy fs` scan lists them). That is
+  what keeps the results reproducible; it is also why none of these stacks may be exposed
+  beyond localhost.
 
 ## 8. Software environment
 
-All components are version-pinned so that the source-level claims are reproducible against
-the exact releases examined:
+Library versions are pinned in each `pom.xml`, and every container image is pinned by tag
+and digest, so the source-level claims are reproducible against the exact releases examined:
 
 | Component | Version |
 |---|---|
 | Keycloak | 26.6.1 |
-| Spring Boot | 3.5.5 |
-| Spring Security | 6.5.5 |
-| Redis | 7 |
-| Envoy | 1.35 |
-| Java | 21 |
+| Spring Boot | 3.5.5 (follow-up: 4.1.2) |
+| Spring Security | 6.5.5 (follow-up: 7.1.2) |
+| Redis | 7 (`redis:7-alpine`) |
+| Envoy | 1.35.13 |
+| Java | 21 (Eclipse Temurin) |
+
+The digests were added on 2026-10-27. Runs before that date used the same tags without
+digests, so a floating tag (`redis:7-alpine`, `nginx:1.27-alpine`, `eclipse-temurin:21-jre`,
+`maven:3.9-eclipse-temurin-21`) may then have resolved to an earlier patch release.
 
 Every claim about library behaviour was read from the corresponding source tag. Full
 citations for the standards, disclosed defects, and prior work referenced here are in
