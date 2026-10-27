@@ -4,7 +4,7 @@ name: oauth-replay-spring7
 # 7.1.2 instead of 6.5.5. Keycloak, realm and client are unchanged.
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.6.1
+    image: quay.io/keycloak/keycloak:26.6.1@sha256:dea26401d06341095cc4ea9d66896200b55de5ca1daa1d2fcbe58493afa6e0ad
     command:
       - start-dev
       - --import-realm
