@@ -2,7 +2,15 @@
 
 Code and results for *Operational Realities of Sender-Constrained OAuth: Replay-State
 Scaling Thresholds and Silent Binding Failures in Distributed Resource-Server Deployments*.
-The accompanying paper will be linked here on publication.
+Published in *Kölner Beiträge zur technischen Informatik*, Band 3/2026, TH Köln,
+[doi:10.57684/COS-1495](https://doi.org/10.57684/COS-1495).
+
+> **Status, October 2026.** Spring Security 7.0.7 and 7.1.1, released 2026-08-20, replace
+> the cache studied here with `DPoPProofReplayValidator`: 100,000 entries, at most 1000 per
+> client key, a ±30 s window, and a full cache rejects new proofs instead of evicting old
+> ones. The results below apply to Spring Security 6.5.x (6.5.11, the last open-source
+> 6.5 release, still ships the old cache), 7.0.0 to 7.0.6, and 7.1.0. On those versions,
+> upgrade to 7.0.7, 7.1.1 or later.
 
 ## Overview
 
@@ -12,8 +20,8 @@ layer: the client signs a short-lived proof for each request, and the resource s
 rejects any proof it has already seen. Detecting a repeat requires the server to retain
 recent proof identifiers, which it does in a replay cache.
 
-This work shows that the default DPoP replay cache in the Spring Security framework cannot
-sustain that guarantee under realistic load. The cache holds 1000 entries and evicts the
+This work shows that the default DPoP replay cache in Spring Security 6.5, and in 7.x before
+7.0.7 and 7.1.1, cannot sustain that guarantee under realistic load. The cache holds 1000 entries and evicts the
 oldest first, so once roughly 1000 fresh proofs pass through it a previously seen proof is
 evicted and becomes replayable. On a single node this occurs above approximately 17
 requests per second, with no error and no log entry. The cache is a single instance shared
@@ -99,10 +107,12 @@ construction, because it assumes independent samples and latency series are auto
 
 ## 4. Pre-registration
 
-`PREREGISTRATION.md` was the first commit and holds only the hypotheses and protocol: no
-stack, no measurement code, no results. Measured data first appears 46 minutes later. The
-ordering is checkable in the git history and the two commit hashes are recorded in the
-paper's appendix.
+`PREREGISTRATION.md` holds only the hypotheses and protocol: no stack, no measurement code,
+no results. H1–H4 have not been run, so no data for them exists.
+
+The git commit timestamps do not establish the order in which the files were written, so
+the statement in the paper's Appendix A that the ordering is verifiable from the repository
+history does not hold. See [`docs/DEVIATIONS.md`](docs/DEVIATIONS.md#commit-timestamps).
 
 ## 5. Reproducing the results
 
@@ -121,7 +131,7 @@ its own stack, README, and loopback-bound ports; run them one at a time.
 ## 6. Repository structure
 
 ```
-PREREGISTRATION.md          hypotheses and protocol, committed before any data
+PREREGISTRATION.md          hypotheses and protocol; H1-H4 not yet run
 PROTOCOL.md                 measurement protocol
 docs/ARTIFACT-APPENDIX.md   claim-to-experiment map (USENIX template)
 docs/DEVIATIONS.md          departures from the plan, and a known flaw in it

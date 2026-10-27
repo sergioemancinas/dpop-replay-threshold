@@ -1,9 +1,25 @@
 cff-version: 1.2.0
-message: "If you use this artifact, please cite it using these metadata."
+message: "If you use this artifact, please cite the paper below."
 title: "Operational Realities of Sender-Constrained OAuth: Replay-State Scaling Thresholds and Silent Binding Failures in Distributed Resource-Server Deployments"
 type: software
 authors:
-  - alias: sergioemancinas
+  - family-names: "Mancinas Fontalvo"
+    given-names: "Sergio Emiliano"
+    alias: sergioemancinas
 repository-code: "https://github.com/sergioemancinas/dpop-replay-threshold"
 license: Apache-2.0
 # doi: 10.5281/zenodo.XXXXXXX   # add the Zenodo archive DOI once minted
+preferred-citation:
+  type: article
+  title: "Operational Realities of Sender-Constrained OAuth: Replay-State Scaling Thresholds and Silent Binding Failures in Distributed Resource-Server Deployments"
+  authors:
+    - family-names: "Mancinas Fontalvo"
+      given-names: "Sergio Emiliano"
+  journal: "Kölner Beiträge zur technischen Informatik"
+  issue: "3"
+  year: 2026
+  issn: "2193-570X"
+  publisher:
+    name: "TH Köln"
+  doi: "10.57684/COS-1495"
+  url: "https://doi.org/10.57684/COS-1495"
