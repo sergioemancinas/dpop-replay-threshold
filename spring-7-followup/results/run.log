@@ -1,0 +1,16 @@
+A  R=  5 req/s  load {'200': 140}  replay HTTP 401
+A  R= 17 req/s  load {'200': 476}  replay HTTP 401
+A  R= 18 req/s  load {'200': 504}  replay HTTP 401
+A  R= 25 req/s  load {'200': 700}  replay HTTP 401
+A  R= 40 req/s  load {'200': 999, '401': 121}  replay HTTP 401
+B  victim first use 200, replay before 401, flood {'401': 1050}, replay after 401
+C  R= 15 req/s  {'200': 1050}  first rejection at - s  accepted last 30 s: 15.0 req/s
+C  R= 20 req/s  {'200': 1400}  first rejection at - s  accepted last 30 s: 20.0 req/s
+C  R= 24 req/s  {'200': 1680}  first rejection at - s  accepted last 30 s: 24.0 req/s
+C  R= 26 req/s  {'200': 1802, '401': 18}  first rejection at 39.424 s  accepted last 30 s: 25.9 req/s
+C  R= 28 req/s  {'200': 1860, '401': 100}  first rejection at 36.536 s  accepted last 30 s: 27.9 req/s
+C  R= 30 req/s  {'200': 1920, '401': 180}  first rejection at 34.068 s  accepted last 30 s: 29.9 req/s
+C  R= 32 req/s  {'200': 1976, '401': 264}  first rejection at 31.844 s  accepted last 30 s: 31.9 req/s
+C  R= 35 req/s  {'200': 2015, '401': 435}  first rejection at 28.573 s  accepted last 30 s: 33.3 req/s
+C  R= 40 req/s  {'200': 2015, '401': 785}  first rejection at 25.001 s  accepted last 30 s: 33.3 req/s
+C  R= 50 req/s  {'200': 2012, '401': 1488}  first rejection at 20.001 s  accepted last 30 s: 33.3 req/s
