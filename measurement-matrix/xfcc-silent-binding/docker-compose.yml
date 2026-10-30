@@ -32,7 +32,7 @@ services:
       - "127.0.0.1:18080:80"
 
   envoy:
-    image: envoyproxy/envoy:v1.35.13@sha256:a707c3821b4cecb5db43d8e86e983e0f57b81010fefbabc01feeb071fb8cc08e
+    image: envoyproxy/envoy:v1.40.2@sha256:8de97e654644827d62afdbf7e1d3dc9fee01a8690d410dd1c63a30dc6b6cecbb
     command:
       - --config-path
       - /etc/envoy/envoy.yaml
