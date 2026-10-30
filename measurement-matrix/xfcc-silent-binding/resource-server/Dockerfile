@@ -8,7 +8,7 @@ COPY src ./src
 # changes.
 RUN mvn -q -B package
 
-FROM eclipse-temurin:21-jre@sha256:ff92a063dac03a29fca3987bcfc66aa5f17769542df802bbf7d2ebaba4df8ebe
+FROM eclipse-temurin:25-jre@sha256:ecdc0adb37bde1a281c4d245a3cd535004b1fc8322d560f5b09463b248c81df0
 WORKDIR /app
 COPY --from=build /build/target/xfcc-resource-server-1.0.0.jar app.jar
 # Nothing here needs root.
